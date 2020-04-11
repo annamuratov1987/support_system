@@ -36,4 +36,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function complaints()
+    {
+        return $this->hasMany('App\Complaint');
+    }
+
+    public function isManager(){
+        return $this->role == 'manager';
+    }
 }

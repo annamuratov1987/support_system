@@ -26,8 +26,12 @@ class ComplaintController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        $complaints = null;
+        if (Auth::user()->isManager()){
+            $complaints = Complaint::all();
+        }else{
+            $complaints = Auth::user()->complaints;
+        }
+        
         return view('complaint.index', ['complaints' => $complaints]);
     }
 
@@ -38,6 +42,9 @@ class ComplaintController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->can('create', Complaint::class)){
+            abort(403);
+        }
         return view('complaint.create');
     }
 
@@ -49,6 +56,10 @@ class ComplaintController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Auth::user()->can('create', Complaint::class)){
+            abort(403);
+        }
+
         Validator::make(
             $request->all(),
             [
@@ -58,18 +69,16 @@ class ComplaintController extends Controller
             ]
         )->validate();
 
-        $filePath = null;
-        if($request->hasFile('file')){
-            $filePath = $request->file('file')->store('complaint_files');
-        }
-
         $complaint = new Complaint();
         $complaint->user_id = $request->user()->id;
         $complaint->theme = $request->input('theme');
         $complaint->message = $request->input('message');
-        $complaint->file_path = $filePath;
+        if($request->hasFile('file')){
+            $complaint->file_path = $request->file('file')->store('complaint_files');
+        }
         $complaint->save();
 
+        return redirect()->route('complaints.index');
     }
 
     /**
@@ -80,7 +89,13 @@ class ComplaintController extends Controller
      */
     public function show($id)
     {
-        //
+        $complaint = $this->getModel($id);
+
+        if (!Auth::user()->can('view',$complaint)){
+            abort(403);
+        }
+
+        return view('complaint.show', ['complaint' => $complaint]);
     }
 
     /**
@@ -91,7 +106,13 @@ class ComplaintController extends Controller
      */
     public function edit($id)
     {
-        //
+        $complaint = $this->getModel($id);
+
+        if (!Auth::user()->can('update',$complaint)){
+            abort(403);
+        }
+
+        return view('complaint.edit', ['complaint' => $complaint]);
     }
 
     /**
@@ -103,7 +124,30 @@ class ComplaintController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $complaint = $this->getModel($id);
+
+        if (!Auth::user()->can('update', $complaint)){
+            abort(403);
+        }
+
+        Validator::make(
+            $request->all(),
+            [
+                'theme' => 'required|min:3',
+                'message' => 'required|min:5',
+                'file' => 'file'
+            ]
+        )->validate();
+
+        $complaint->user_id = $request->user()->id;
+        $complaint->theme = $request->input('theme');
+        $complaint->message = $request->input('message');
+        if($request->hasFile('file')){
+            $complaint->file_path = $request->file('file')->store('complaint_files');
+        }
+        $complaint->update();
+
+        return redirect()->route('complaints.show', $complaint);
     }
 
     /**
@@ -115,5 +159,13 @@ class ComplaintController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    private function getModel($id){
+        $model = Complaint::find($id);
+        if (is_null($model)){
+            abort(404);
+        }
+        return $model;
     }
 }

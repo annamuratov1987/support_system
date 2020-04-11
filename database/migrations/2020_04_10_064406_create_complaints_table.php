@@ -19,7 +19,8 @@ class CreateComplaintsTable extends Migration
             $table->bigInteger('user_id');
             $table->string('theme');
             $table->text('message');
-            $table->string('file_path');
+            $table->string('file_path')->nullable();
+            $table->string('status')->default('created');
         });
     }
 

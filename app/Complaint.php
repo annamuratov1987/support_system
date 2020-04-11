@@ -21,4 +21,8 @@ class Complaint extends Model
     protected $fillable = [
         'user_id', 'theme', 'message', 'file_path'
     ];
+
+    public function author(){
+        return $this->belongsTo('App\User', 'user_id');
+    }
 }
