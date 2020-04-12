@@ -96,6 +96,11 @@ class ComplaintController extends Controller
             abort(403);
         }
 
+        if (($complaint->status == 'created' || $complaint->status == 'unviewed') && Auth::user()->isManager()){
+            $complaint->status = 'viewed';
+            $complaint->update();
+        }
+
         return view('complaint.show', ['complaint' => $complaint, 'answers' => $complaint->answers]);
     }
 
@@ -146,7 +151,14 @@ class ComplaintController extends Controller
         if($request->hasFile('file')){
             $complaint->file_path = $request->file('file')->store('complaint_files');
         }
+        $complaint->status = 'unviewed';
         $complaint->update();
+
+        $answer = new Answer();
+        $answer->user_id = Auth::user()->id;
+        $answer->complaint_id = $complaint->id;
+        $answer->text = 'Изменено заявка.';
+        $answer->save();
 
         return redirect()->route('complaints.show', $complaint);
     }
@@ -193,6 +205,39 @@ class ComplaintController extends Controller
             $answer->file_path = $request->file('file')->store('answer_files');
         }
         $answer->save();
+
+        if (Auth::user()->isManager()){
+            $complaint->status = 'answered';
+        }else{
+            $complaint->status = 'unviewed';
+        }
+        $complaint->update();
+
+        return redirect()->route('complaints.show', $complaint);
+    }
+
+    public function accept($id){
+        $complaint = $this->getModel($id);
+
+        if (!Auth::user()->can('accept', Complaint::class)){
+            abort(403);
+        }
+
+        $complaint->status = 'accept';
+        $complaint->update();
+
+        return redirect()->route('complaints.show', $complaint);
+    }
+
+    public function close($id){
+        $complaint = $this->getModel($id);
+
+        if (!Auth::user()->can('close', $complaint)){
+            abort(403);
+        }
+
+        $complaint->status = 'closed';
+        $complaint->update();
 
         return redirect()->route('complaints.show', $complaint);
     }

@@ -58,6 +58,9 @@
                                     <button type="submit" class="btn btn-primary">
                                         {{ __('Сохранить') }}
                                     </button>
+                                    <a href="{{route('complaints.show', $complaint)}}" class="btn btn-primary">
+                                        {{ __('Отменить') }}
+                                    </a>
                                 </div>
                             </div>
                         </form>

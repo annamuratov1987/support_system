@@ -5,13 +5,39 @@
         <div class="col-10 m-auto">
             <div class="card border-success mb-3">
                 <div class="card-header bg-transparent text-success">
+                    @switch($complaint->status)
+                        @case('created')
+                        <span class="badge badge-danger">!</span>
+                        @break
+                        @case('viewed')
+                        <span class="badge badge-warning">!</span>
+                        @break
+                        @case('accept')
+                        <span class="badge badge-primary">&#9850;</span>
+                        @break
+                        @case('answered')
+                        <span class="badge badge-success">&#10004;</span>
+                        @break
+                        @case('unviewed')
+                        <span class="badge badge-danger">&#9993;</span>
+                        @break
+                        @default
+                        <span class="badge badge-secondary">&#10008;</span>
+                    @endswitch
                     {{$complaint->author->name}}
                     <span class="badge badge-light badge-secondary">{{$complaint->updated_at}}</span>
                     <ul class="nav float-right">
                         @if(!Auth::user()->isManager())
-                            <li class="nav-item">
+                        <li class="nav-item">
                             <a class="btn btn-light" href="{{route('complaints.edit', $complaint)}}">{{__('Редактировать')}}</a>
                         </li>
+                        <li class="nav-item ml-2">
+                            <a class="btn btn-light" href="{{route('complaints.close', $complaint)}}">{{__('Закрыть')}}</a>
+                        </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="btn btn-light" href="{{route('complaints.accept', $complaint)}}">{{__('Принять')}}</a>
+                            </li>
                         @endif
                     </ul>
                 </div>
@@ -38,9 +64,7 @@
                             @endif
                         </div>
                         @endforeach
-
-
-
+                        @if($complaint->status != 'closed')
                         <div class="list-group-item">
                             <form method="POST" action="{{route('complaints.answer', $complaint)}}" enctype="multipart/form-data">
                                 @csrf
@@ -71,6 +95,7 @@
                                 </div>
                             </form>
                         </div>
+                        @endif
                     </div>
 
                 </div>

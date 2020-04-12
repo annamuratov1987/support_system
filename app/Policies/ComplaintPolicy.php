@@ -95,4 +95,12 @@ class ComplaintPolicy
     public function answer(User $user, Complaint $complaint){
         return $user->id == $complaint->user_id || $user->isManager();
     }
+
+    public function accept(User $user){
+        return $user->isManager();
+    }
+
+    public function close(User $user, Complaint $complaint){
+        return $user->id == $complaint->user_id && !$user->isManager();
+    }
 }

@@ -18,3 +18,7 @@ Auth::routes();
 Route::resource('complaints', 'ComplaintController');
 
 Route::post('complaints/{cmplaint}/answer', 'ComplaintController@answer')->name('complaints.answer');
+
+Route::get('complaints/{cmplaint}/accept', 'ComplaintController@accept')->name('complaints.accept');
+
+Route::get('complaints/{cmplaint}/close', 'ComplaintController@close')->name('complaints.close');
