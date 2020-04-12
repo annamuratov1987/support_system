@@ -1,5 +1,13 @@
 @extends('layouts.app')
 
+@section('page-navbar')
+    @if(!Auth::user()->isManager())
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('complaints.create') }}">{{ __('Создать заявка') }}</a>
+        </li>
+    @endif
+@endsection
+
 @section('content')
     <div class="row">
         @foreach($complaints as $complaint)

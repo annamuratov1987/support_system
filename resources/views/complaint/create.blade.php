@@ -1,5 +1,11 @@
 @extends('layouts.app')
 
+@section('page-navbar')
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('complaints.index') }}">{{ __('Заявки') }}</a>
+    </li>
+@endsection
+
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
@@ -8,7 +14,15 @@
                     <div class="card-header">{{ __('Создать заявка') }}</div>
 
                     <div class="card-body">
-                        <form method="POST" action="{{route('complaints.store')}}" enctype="multipart/form-data">
+                        @if(Auth::user()->isCreateComplaintInDay())
+                            <div class="alert alert-warning" role="alert">
+                                <h4 class="alert-heading">{{__('Пожалуйста, ждите!')}}</h4>
+                                <p>{{__('Вы не можете оставлять заявку, чаще раза в сутки.')}}</p>
+                                <hr>
+                                <p class="mb-0">{{__('Извините за неудобства!')}}</p>
+                            </div>
+                        @else
+                            <form method="POST" action="{{route('complaints.store')}}" enctype="multipart/form-data">
                             @csrf
 
                             <div class="form-group row">
@@ -64,6 +78,7 @@
                                 </div>
                             </div>
                         </form>
+                        @endif
                     </div>
                 </div>
             </div>

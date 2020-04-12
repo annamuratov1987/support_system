@@ -45,4 +45,13 @@ class User extends Authenticatable
     public function isManager(){
         return $this->role == 'manager';
     }
+
+    public function isCreateComplaintInDay(){
+        $today = date('Y-m-d H:i:s', strtotime("today"));
+        $complaint = Complaint::where('created_at', '>=', $today)->get();
+        if ($complaint->isEmpty()){
+            return false;
+        }
+        return true;
+    }
 }

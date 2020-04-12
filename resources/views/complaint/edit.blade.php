@@ -1,5 +1,11 @@
 @extends('layouts.app')
 
+@section('page-navbar')
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('complaints.index') }}">{{ __('Заявки') }}</a>
+    </li>
+@endsection
+
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
