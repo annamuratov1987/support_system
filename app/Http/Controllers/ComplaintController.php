@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Answer;
 use App\Complaint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,7 +96,7 @@ class ComplaintController extends Controller
             abort(403);
         }
 
-        return view('complaint.show', ['complaint' => $complaint]);
+        return view('complaint.show', ['complaint' => $complaint, 'answers' => $complaint->answers]);
     }
 
     /**
@@ -167,5 +168,32 @@ class ComplaintController extends Controller
             abort(404);
         }
         return $model;
+    }
+
+    public function answer(Request $request, $id){
+        $complaint = $this->getModel($id);
+
+        if (!Auth::user()->can('answer', $complaint)){
+            abort(403);
+        }
+
+        Validator::make(
+            $request->all(),
+            [
+                'text' => 'required',
+                'file' => 'file'
+            ]
+        )->validate();
+
+        $answer = new Answer();
+        $answer->user_id = $request->user()->id;
+        $answer->complaint_id = $complaint->id;
+        $answer->text = $request->input('text');
+        if($request->hasFile('file')){
+            $answer->file_path = $request->file('file')->store('answer_files');
+        }
+        $answer->save();
+
+        return redirect()->route('complaints.show', $complaint);
     }
 }

@@ -3,9 +3,9 @@
 @section('content')
     <div class="row">
         @foreach($complaints as $complaint)
-            <div class="col-10 m-auto">
+            <div class="col-9 m-auto">
                 <div class="card border-success mb-3">
-                    <div class="card-header bg-transparent border-success text-success">
+                    <div class="card-header bg-transparent text-success">
                         {{$complaint->author->name}}
                         <span class="badge badge-light badge-secondary">{{$complaint->updated_at}}</span>
                         <ul class="nav float-right">

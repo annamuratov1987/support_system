@@ -13,6 +13,8 @@
 
 Route::get('/', 'ComplaintController@index')->name('main');
 
-Auth::routes([]);
+Auth::routes();
 
 Route::resource('complaints', 'ComplaintController');
+
+Route::post('complaints/{cmplaint}/answer', 'ComplaintController@answer')->name('complaints.answer');
