@@ -17,3 +17,7 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->describe('Display an inspiring quote');
+
+Artisan::command('manager:add {email}', function ($email) {
+    $this->info('Manager added.');
+})->describe('Add manager to system by email');
