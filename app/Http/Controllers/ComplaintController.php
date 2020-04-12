@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Answer;
 use App\Complaint;
+use App\Mail\CreateComplaint;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class ComplaintController extends Controller
@@ -105,6 +108,8 @@ class ComplaintController extends Controller
             $complaint->file_path = $request->file('file')->store('complaint_files');
         }
         $complaint->save();
+
+        Mail::to(User::getManagers())->send(new CreateComplaint($complaint));
 
         return redirect()->route('complaints.index');
     }

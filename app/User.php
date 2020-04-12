@@ -54,4 +54,9 @@ class User extends Authenticatable
         }
         return true;
     }
+
+    public static function getManagers(){
+        $managers = User::where('role', '=', 'manager')->get();
+        return $managers;
+    }
 }
