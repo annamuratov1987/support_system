@@ -25,15 +25,42 @@ class ComplaintController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $filter = null;
         if (Auth::user()->isManager()){
-            $complaints = Complaint::all();
+            if ($request->has('filter')){
+                $filter = $request->input('filter');
+                switch ($filter){
+                    case 'unclosed':
+                        $complaints = Complaint::where('status', '!=', 'closed')->get();
+                        break;
+                    case 'untreated':
+                        $complaints = Complaint::where([['status', '!=', 'closed'],['status', '!=', 'answered']])->get();
+                        break;
+                    case 'unviewed':
+                        $complaints = Complaint::where('status', '=', 'created')->orWhere('status', '=', 'unviewed')->get();
+                        break;
+                    case 'viewed':
+                        $complaints = Complaint::where('status', '=', 'viewed')->orWhere('status', '=', 'accept')->get();
+                        break;
+                    case 'answered':
+                        $complaints = Complaint::where('status', '=', 'answered')->get();
+                        break;
+                    case 'closed':
+                        $complaints = Complaint::where('status', '=', 'closed')->get();
+                        break;
+                    default:
+                        $complaints = Complaint::all();
+                }
+            }else{
+                $complaints = Complaint::all();
+            }
         }else{
             $complaints = Auth::user()->complaints;
         }
         
-        return view('complaint.index', ['complaints' => $complaints]);
+        return view('complaint.index', ['complaints' => $complaints, 'filter' => $filter]);
     }
 
     /**

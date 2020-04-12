@@ -1,7 +1,19 @@
 @extends('layouts.app')
 
 @section('page-navbar')
-    @if(!Auth::user()->isManager())
+    @if(Auth::user()->isManager())
+        <li class="nav-item mr-5">
+            <select class="custom-select" id="filter">
+                <option value="all" @unless($filter) selected @endunless>{{__('все заявки')}}</option>
+                <option value="unclosed" @if($filter == 'unclosed') selected @endif>{{__('незакрытые')}}</option>
+                <option value="untreated" @if($filter == 'untreated') selected @endif>{{__('необработанные')}}</option>
+                <option value="unviewed" @if($filter == 'unviewed') selected @endif>{{__('непросмотренные')}}</option>
+                <option value="viewed" @if($filter == 'viewed') selected @endif>{{__('просмотренные')}}</option>
+                <option value="answered" @if($filter == 'answered') selected @endif>{{__('обработанные')}}</option>
+                <option value="closed" @if($filter == 'closed') selected @endif>{{__('закрытые')}}</option>
+            </select>
+        </li>
+    @else
         <li class="nav-item">
             <a class="nav-link" href="{{ route('complaints.create') }}">{{ __('Создать заявка') }}</a>
         </li>
@@ -53,3 +65,11 @@
         @endforeach
     </div>
 @endsection
+
+<script>
+    window.addEventListener('load', function () {
+        $('#filter').on('change', function () {
+            window.location.replace('?filter=' + this.value);
+        });
+    });
+</script>
