@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Answer;
 use App\Complaint;
+use App\Mail\AnswerComplaint;
+use App\Mail\CloseComplaint;
 use App\Mail\CreateComplaint;
 use App\User;
 use Illuminate\Http\Request;
@@ -245,6 +247,12 @@ class ComplaintController extends Controller
         }
         $complaint->update();
 
+        if (Auth::user()->isManager()){
+            Mail::to($complaint->author)->send(new AnswerComplaint($complaint, $answer));
+        }else{
+            Mail::to(User::getManagers())->send(new AnswerComplaint($complaint, $answer));
+        }
+
         return redirect()->route('complaints.show', $complaint);
     }
 
@@ -270,6 +278,8 @@ class ComplaintController extends Controller
 
         $complaint->status = 'closed';
         $complaint->update();
+
+        Mail::to(User::getManagers())->send(new CloseComplaint($complaint));
 
         return redirect()->route('complaints.show', $complaint);
     }
